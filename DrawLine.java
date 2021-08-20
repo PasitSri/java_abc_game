@@ -69,5 +69,4 @@ public class DrawLine extends JPanel{
 		return true;
 	}
 
-
 }

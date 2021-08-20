@@ -1,14 +1,21 @@
 import java.awt.*;
 import javax.swing.*;
+import java.awt.event.MouseEvent;
 import java.util.Random;
+import java.awt.event.MouseAdapter;
 
-public class DrawLine extends JPanel{
-	String[][] board={ {"A","B","C","D"},{"E","F","G","H"},{"I","J"," ","K"}};
+public class DrawLine extends JFrame{
+	static String[][] board={ {"A","B","C","D"},{"E","F","G","H"},{"I","J"," ","K"}};
 	int[] blank_position = {2,2};
 	int size=200;
 	int w=800, h=600;
-	public void paintComponent(Graphics g){
+	boolean checkWinner = false;
+
+	public void paint(Graphics g){
 		int text_x=80, text_y=100;
+		g.setColor(Color.white);
+		g.fillRect(0,0,w,h);
+		g.setColor(Color.black);
 		g.setFont(new Font("Ubuntu", Font.PLAIN, 70));
 		for(int r=0; r<3; r++){
 			g.drawLine(0, size*r, w, size*r);
@@ -22,16 +29,28 @@ public class DrawLine extends JPanel{
 		}
 	}
 
+	public DrawLine(){
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setBackground(Color.white);
+		setSize(w, h);
+		addMouseListener(new MouseAdapter(){
+			public void mouseClicked(MouseEvent e){
+				swapChar(e.getX(), e.getY());
+				repaint();
+			}
+
+		});
+
+		setVisible(true);
+		randomAlpha();
+	}
+
 	public static void main(String[] args){
-		JFrame window = new JFrame();
-		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		window.setBackground(Color.white);
-		window.setSize(800, 600);
-
-		DrawLine panel = new DrawLine();
-
-		window.add(panel);
-		window.setVisible(true);
+		new DrawLine();
+//		checkWinner(board);
+//		if(checkWinner(board) == true){
+//			winSceen();
+//		}
 	}
 
 	public void randomAlpha(){
@@ -57,7 +76,7 @@ public class DrawLine extends JPanel{
 	}
 
 
-	boolean checkWinner(String[][] board){
+	public static boolean checkWinner(String[][] board){
 		String[][] boardWinner = { {"A","B","C","D"},{"E","F","G","H"},{"I","J","K"," "}};  
 		for(int r=0; r<3; r++){
 			for(int c=0; c<4; c++){
@@ -69,4 +88,34 @@ public class DrawLine extends JPanel{
 		return true;
 	}
 
+//	public static void winSceen(){
+//		JFrame f = new JFrame();
+//		Label l = new Label("VICTORY");
+//		f.add(l);
+//		f.setSize(800,600);
+//		f.setBackground(Color.black);
+//		f.setVisible(true);
+//	}
+
+	public void swapChar(int mouseX, int mouseY){
+		int block_x=0;
+		int block_y=0;
+		for(int r=0; r<3; r++){
+			for(int c=0; c<4; c++){
+				if(mouseX>block_x && mouseX<block_x+size && mouseY>block_y && mouseY<block_y+size){
+					if(((r-1==blank_position[0]||r+1==blank_position[0]) && c==blank_position[1]) || ((c-1==blank_position[1]||c+1==blank_position[1]) &&r==blank_position[0])){
+						board[blank_position[0]][blank_position[1]] = board[r][c];
+						board[r][c] = " ";
+						blank_position[0] = r;
+						blank_position[1] = c;
+					}
+				}
+				block_x += size;
+			}
+			block_x =0;
+			block_y += size;
+		}
+	}
+
 }
+

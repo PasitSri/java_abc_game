@@ -1,8 +1,10 @@
 import java.awt.*;
 import javax.swing.*;
+import java.util.Random;
 
 public class DrawLine extends JPanel{
 	String[][] board={ {"A","B","C","D"},{"E","F","G","H"},{"I","J"," ","K"}};
+	int[] blank_position = {2,2};
 	int size=200;
 	int w=800, h=600;
 	public void paintComponent(Graphics g){
@@ -31,5 +33,41 @@ public class DrawLine extends JPanel{
 		window.add(panel);
 		window.setVisible(true);
 	}
+
+	public void randomAlpha(){
+		String buffer;
+		Random rand = new Random();
+		for(int r=0; r<3; r++){
+			for(int c=0; c<4; c++){
+				int ranRow = rand.nextInt(3);
+				int ranCol = rand.nextInt(4);
+				buffer = board[r][c];
+				board[r][c] = board[ranRow][ranCol];
+				board[ranRow][ranCol] = buffer;
+				if(board[ranRow][ranCol] == " "){
+					blank_position[0] = ranRow;
+					blank_position[1] = ranCol;
+				}
+				else if(board[r][c] == " "){
+					blank_position[0] = r;
+					blank_position[1] = c;
+				}
+			}
+		}  
+	}
+
+
+	boolean checkWinner(String[][] board){
+		String[][] boardWinner = { {"A","B","C","D"},{"E","F","G","H"},{"I","J","K"," "}};  
+		for(int r=0; r<3; r++){
+			for(int c=0; c<4; c++){
+				if(board[r][c] != boardWinner[r][c]){
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
 
 }

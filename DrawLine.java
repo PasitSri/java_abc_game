@@ -21,7 +21,7 @@ public class DrawLine extends JFrame{
 		for(int r=0; r<3; r++){
 			for(int c=0; c<4; c++){
 				int n = fm.stringWidth(board[r][c]);
-				g.drawString(board[r][c], 600-(c*size)+(size/2-n*2), 37+(r*size)+(size/2+n*2));
+				g.drawString(board[r][c], 600-(c*size)+(size/2-n*2), 37+(r*size)+(size/2+15));
 				g.drawRect(600-(c*size),37+(r*size),size,size);
 			}
 		}

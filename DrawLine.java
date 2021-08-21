@@ -3,33 +3,32 @@ import javax.swing.*;
 import java.awt.event.MouseEvent;
 import java.util.Random;
 import java.awt.event.MouseAdapter;
+import java.awt.FontMetrics;
 
 public class DrawLine extends JFrame{
 	static String[][] board={ {"A","B","C","D"},{"E","F","G","H"},{"I","J"," ","K"}};
 	int[] blank_position = {2,2};
 	int size=200;
-	int w=800, h=600;
+	int w=800, h=637;
 	boolean checkWinner = false;
 
 	public void paint(Graphics g){
-		int text_x=80, text_y=100;
+		FontMetrics fm = g.getFontMetrics();
 		g.setColor(Color.white);
 		g.fillRect(0,0,w,h);
 		g.setColor(Color.black);
 		g.setFont(new Font("Ubuntu", Font.PLAIN, 70));
 		for(int r=0; r<3; r++){
-			g.drawLine(0, size*r, w, size*r);
 			for(int c=0; c<4; c++){
-				g.drawString(board[r][c], text_x, text_y);
-				g.drawLine(size*c, 0, size*c, h);
-				text_x += size;
+				int n = fm.stringWidth(board[r][c]);
+				g.drawString(board[r][c], 600-(c*size)+(size/2-n*2), 37+(r*size)+(size/2+n*2));
+				g.drawRect(600-(c*size),37+(r*size),size,size);
 			}
-			text_y += size;
-			text_x = 65;
 		}
 	}
 
 	public DrawLine(){
+		setResizable(false);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setBackground(Color.white);
 		setSize(w, h);

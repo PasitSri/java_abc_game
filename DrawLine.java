@@ -21,7 +21,7 @@ public class DrawLine extends JFrame{
 		for(int r=0; r<3; r++){
 			for(int c=0; c<4; c++){
 				int n = fm.stringWidth(board[r][c]);
-				g.drawString(board[r][c], 600-(c*size)+(size/2-n*2), 37+(r*size)+(size/2+15));
+				g.drawString(board[r][c], (c*size)+(size/2-n*2), 37+(r*size)+(size/2+15));
 				g.drawRect(600-(c*size),37+(r*size),size,size);
 			}
 		}
@@ -99,6 +99,7 @@ public class DrawLine extends JFrame{
 	public void swapChar(int mouseX, int mouseY){
 		int block_x=0;
 		int block_y=0;
+		System.out.printf("%d, %d\n", mouseX, mouseY);
 		for(int r=0; r<3; r++){
 			for(int c=0; c<4; c++){
 				if(mouseX>block_x && mouseX<block_x+size && mouseY>block_y && mouseY<block_y+size){

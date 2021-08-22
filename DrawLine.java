@@ -5,12 +5,84 @@ import java.util.Random;
 import java.awt.event.MouseAdapter;
 import java.awt.FontMetrics;
 
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Node;
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import java.io.File;
+
+
 public class DrawLine extends JFrame{
 	static String[][] board={ {"A","B","C","D"},{"E","F","G","H"},{"I","J"," ","K"}};
 	int[] blank_position = {2,2};
 	int size=200;
 	int w=800, h=637;
 	boolean checkWinner = false;
+
+	public void SaveGame() {
+		try{
+		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+		Document doc = dBuilder.newDocument();
+
+		Element children = doc.createElement("game");
+		doc.appendChild(children);
+		String data = "";
+		for (int r = 0;r < 3;r++) {
+			for (int c = 0;c < 4;c++) {
+				data += board[r][c];
+			}
+		}
+		Element alpha = doc.createElement("alpha");
+		alpha.appendChild(doc.createTextNode(data));
+		children.appendChild(alpha);
+
+		TransformerFactory tranformFac = TransformerFactory.newInstance();
+		Transformer transformer = tranformFac.newTransformer();
+		DOMSource source = new DOMSource(doc);
+		StreamResult result = new StreamResult(new File("game.xml"));
+		transformer.transform(source, result);
+
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+
+	public void LoadGame() {
+		try{
+			File inputFile = new File("game.xml");
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+			Document doc = dBuilder.parse(inputFile);
+			NodeList alphaList = doc.getElementsByTagName("alpha");
+			Element alpha = (Element) alphaList.item(0);
+			String alphaText = alpha.getTextContent();
+			String[] alphaString = alphaText.split("");
+			int i = 0;
+			for (int y = 0;y < 3;y++) {
+				for (int x = 0;x < 4;x++) {
+					board[y][x] = alphaString[i];
+					if(Character.isWhitespace(alphaText.charAt(i))){
+						blank_position[0]=y;
+						blank_position[1]=x;
+						System.out.printf("%d %d", x,y);
+					}
+					i++;
+				}
+			}
+		}
+		catch (Exception e){
+			e.printStackTrace();
+		}
+	}
+
 
 	public void paint(Graphics g){
 		FontMetrics fm = g.getFontMetrics();
@@ -32,24 +104,27 @@ public class DrawLine extends JFrame{
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setBackground(Color.white);
 		setSize(w, h);
+		LoadGame();
+		repaint();
 		addMouseListener(new MouseAdapter(){
 			public void mouseClicked(MouseEvent e){
 				swapChar(e.getX(), e.getY());
+				SaveGame();
 				repaint();
 			}
 
 		});
 
 		setVisible(true);
-		randomAlpha();
+		//randomAlpha();
 	}
 
 	public static void main(String[] args){
 		new DrawLine();
-//		checkWinner(board);
-//		if(checkWinner(board) == true){
-//			winSceen();
-//		}
+		//		checkWinner(board);
+		//		if(checkWinner(board) == true){
+		//			winSceen();
+		//		}
 	}
 
 	public void randomAlpha(){
@@ -87,14 +162,14 @@ public class DrawLine extends JFrame{
 		return true;
 	}
 
-//	public static void winSceen(){
-//		JFrame f = new JFrame();
-//		Label l = new Label("VICTORY");
-//		f.add(l);
-//		f.setSize(800,600);
-//		f.setBackground(Color.black);
-//		f.setVisible(true);
-//	}
+	//	public static void winSceen(){
+	//		JFrame f = new JFrame();
+	//		Label l = new Label("VICTORY");
+	//		f.add(l);
+	//		f.setSize(800,600);
+	//		f.setBackground(Color.black);
+	//		f.setVisible(true);
+	//	}
 
 	public void swapChar(int mouseX, int mouseY){
 		int block_x=0;

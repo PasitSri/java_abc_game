@@ -24,7 +24,7 @@ public class DrawLine extends JFrame{
 	int[] blank_position = {2,2};
 	int size=200;
 	int w=800, h=637;
-	boolean checkWinner = false;
+//	boolean checkWinner = false;
 
 	public void SaveGame() {
 		try{
@@ -103,6 +103,7 @@ public class DrawLine extends JFrame{
 		setResizable(false);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setBackground(Color.white);
+		setTitle("Sorting Game");
 		setSize(w, h);
 		LoadGame();
 		repaint();
@@ -116,7 +117,7 @@ public class DrawLine extends JFrame{
 		});
 
 		setVisible(true);
-		//randomAlpha();
+		randomAlpha();
 	}
 
 	public static void main(String[] args){
@@ -137,11 +138,11 @@ public class DrawLine extends JFrame{
 				buffer = board[r][c];
 				board[r][c] = board[ranRow][ranCol];
 				board[ranRow][ranCol] = buffer;
-				if(board[ranRow][ranCol] == " "){
+				if(board[ranRow][ranCol].contains(" ")){
 					blank_position[0] = ranRow;
 					blank_position[1] = ranCol;
 				}
-				else if(board[r][c] == " "){
+				else if(board[r][c].contains(" ")){
 					blank_position[0] = r;
 					blank_position[1] = c;
 				}
@@ -174,7 +175,6 @@ public class DrawLine extends JFrame{
 	public void swapChar(int mouseX, int mouseY){
 		int block_x=0;
 		int block_y=0;
-		System.out.printf("%d, %d\n", mouseX, mouseY);
 		for(int r=0; r<3; r++){
 			for(int c=0; c<4; c++){
 				if(mouseX>block_x && mouseX<block_x+size && mouseY>block_y && mouseY<block_y+size){

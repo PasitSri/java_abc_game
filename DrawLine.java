@@ -5,12 +5,98 @@ import java.util.Random;
 import java.awt.event.MouseAdapter;
 import java.awt.FontMetrics;
 
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Node;
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import java.io.File;
+
+
 public class DrawLine extends JFrame{
 	static String[][] board={ {"A","B","C","D"},{"E","F","G","H"},{"I","J"," ","K"}};
 	int[] blank_position = {2,2};
 	int size=200;
 	int w=800, h=637;
-	boolean checkWinner = false;
+
+	public void SaveGame() {
+		try{
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+			Document doc = dBuilder.newDocument();
+
+			Element rootElement = doc.createElement("ABCBlockMAP");
+			doc.appendChild(rootElement);
+
+			Element information = doc.createElement("information");
+			rootElement.appendChild(information);
+			Element GameVersion = doc.createElement("GameVersion");
+			GameVersion.appendChild(doc.createTextNode("0"));
+			Element PlayTime = doc.createElement("PlayTime");
+			PlayTime.appendChild(doc.createTextNode("0"));
+			Element MoveCount = doc.createElement("MoveCount");
+			MoveCount.appendChild(doc.createTextNode("0"));
+
+			Element Map = doc.createElement("Map");
+			rootElement.appendChild(Map);
+
+			for (int r = 0;r < 3;r++) {
+				String data = "";
+				String Name = "Row" + String.valueOf(i+1);
+				for (int c = 0;c < 4;c++) {
+					data += board[r][c];
+				}
+				Element Row = doc.createElement(Name);
+				Row.appendChild(doc.createTextNode(data));
+				children.appendChild(Row);
+			}
+
+			TransformerFactory transformerFactory = TransformerFactory.newInstance();
+			Transformer transformer = transformerFactory.newTransformer();
+			DOMSource source = new DOMSource(doc);
+			StreamResult result = new StreamResult(new File("java_abc_game.xml"));
+			transformer.transform(source, result);
+
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+
+	public void LoadGame() {
+		try{
+			File inputFile = new File("java_abc_game.xml");
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+			Document doc = dBuilder.parse(inputFile);
+
+			for (int y = 0;y < 3;y++) {
+				String Name = "Row" + String.valueOf(y+1);
+				NodeList rowList = doc.getElementsByTagName(Name);
+				Element row = (Element) rowList.item(0);
+				String rowText = row.getTextContent();
+				String[] rowString = rowText.split("");
+				for (int x = 0;x < 4;x++) {
+					board[y][x] = rowString[y];
+					if(Character.isWhitespace(alphaText.charAt(i))){
+						blank_position[0]=y;
+						blank_position[1]=x;
+						System.out.printf("%d %d", x,y);
+					}
+					i++;
+				}
+			}
+		}
+		catch (Exception e){
+			e.printStackTrace();
+		}
+	}
+
 
 	public void paint(Graphics g){
 		FontMetrics fm = g.getFontMetrics();
@@ -21,7 +107,7 @@ public class DrawLine extends JFrame{
 		for(int r=0; r<3; r++){
 			for(int c=0; c<4; c++){
 				int n = fm.stringWidth(board[r][c]);
-				g.drawString(board[r][c], 600-(c*size)+(size/2-n*2), 37+(r*size)+(size/2+15));
+				g.drawString(board[r][c], (c*size)+(size/2-n*2), 37+(r*size)+(size/2+15));
 				g.drawRect(600-(c*size),37+(r*size),size,size);
 			}
 		}
@@ -31,10 +117,14 @@ public class DrawLine extends JFrame{
 		setResizable(false);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setBackground(Color.white);
+		setTitle("Sorting Game");
 		setSize(w, h);
+		LoadGame();
+		repaint();
 		addMouseListener(new MouseAdapter(){
 			public void mouseClicked(MouseEvent e){
 				swapChar(e.getX(), e.getY());
+				SaveGame();
 				repaint();
 			}
 
@@ -45,11 +135,51 @@ public class DrawLine extends JFrame{
 	}
 
 	public static void main(String[] args){
+		try{
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+			Document doc = dBuilder.newDocument();
+
+			Element rootElement = doc.createElement("ABCBlockMAP");
+			doc.appendChild(rootElement);
+
+			Element information = doc.createElement("information");
+			rootElement.appendChild(information);
+			Element GameVersion = doc.createElement("GameVersion");
+			GameVersion.appendChild(doc.createTextNode("0"));
+			Element PlayTime = doc.createElement("PlayTime");
+			PlayTime.appendChild(doc.createTextNode("0"));
+			Element MoveCount = doc.createElement("MoveCount");
+			MoveCount.appendChild(doc.createTextNode("0"));
+
+			Element Map = doc.createElement("Map");
+			rootElement.appendChild(Map);
+
+			for (int r = 0;r < 3;r++) {
+				String data = "";
+				String Name = "Row" + String.valueOf(i+1);
+				for (int c = 0;c < 4;c++) {
+					data += board[r][c];
+				}
+				Element Row = doc.createElement(Name);
+				Row.appendChild(doc.createTextNode(data));
+				children.appendChild(Row);
+			}
+
+			TransformerFactory transformerFactory = TransformerFactory.newInstance();
+			Transformer transformer = transformerFactory.newTransformer();
+			DOMSource source = new DOMSource(doc);
+			StreamResult result = new StreamResult(new File("java_abc_game.xml"));
+			transformer.transform(source, result);
+
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 		new DrawLine();
-//		checkWinner(board);
-//		if(checkWinner(board) == true){
-//			winSceen();
-//		}
+		//		checkWinner(board);
+		//		if(checkWinner(board) == true){
+		//			winSceen();
+		//		}
 	}
 
 	public void randomAlpha(){
@@ -62,21 +192,21 @@ public class DrawLine extends JFrame{
 				buffer = board[r][c];
 				board[r][c] = board[ranRow][ranCol];
 				board[ranRow][ranCol] = buffer;
-				if(board[ranRow][ranCol] == " "){
+				if(board[ranRow][ranCol].contains(" ")){
 					blank_position[0] = ranRow;
 					blank_position[1] = ranCol;
 				}
-				else if(board[r][c] == " "){
+				else if(board[r][c].contains(" ")){
 					blank_position[0] = r;
 					blank_position[1] = c;
 				}
 			}
-		}  
+		}
 	}
 
 
 	public static boolean checkWinner(String[][] board){
-		String[][] boardWinner = { {"A","B","C","D"},{"E","F","G","H"},{"I","J","K"," "}};  
+		String[][] boardWinner = { {"A","B","C","D"},{"E","F","G","H"},{"I","J","K"," "}};
 		for(int r=0; r<3; r++){
 			for(int c=0; c<4; c++){
 				if(board[r][c] != boardWinner[r][c]){
@@ -87,14 +217,14 @@ public class DrawLine extends JFrame{
 		return true;
 	}
 
-//	public static void winSceen(){
-//		JFrame f = new JFrame();
-//		Label l = new Label("VICTORY");
-//		f.add(l);
-//		f.setSize(800,600);
-//		f.setBackground(Color.black);
-//		f.setVisible(true);
-//	}
+	//	public static void winSceen(){
+	//		JFrame f = new JFrame();
+	//		Label l = new Label("VICTORY");
+	//		f.add(l);
+	//		f.setSize(800,600);
+	//		f.setBackground(Color.black);
+	//		f.setVisible(true);
+	//	}
 
 	public void swapChar(int mouseX, int mouseY){
 		int block_x=0;
@@ -117,4 +247,3 @@ public class DrawLine extends JFrame{
 	}
 
 }
-

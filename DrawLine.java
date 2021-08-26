@@ -4,7 +4,6 @@ import java.awt.event.MouseEvent;
 import java.util.Random;
 import java.awt.event.MouseAdapter;
 import java.awt.FontMetrics;
-
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.transform.Transformer;
@@ -48,13 +47,13 @@ public class DrawLine extends JFrame{
 
 			for (int r = 0;r < 3;r++) {
 				String data = "";
-				String Name = "Row" + String.valueOf(i+1);
+				String Name = "Row" + String.valueOf(r+1);
 				for (int c = 0;c < 4;c++) {
 					data += board[r][c];
 				}
 				Element Row = doc.createElement(Name);
 				Row.appendChild(doc.createTextNode(data));
-				children.appendChild(Row);
+				Map.appendChild(Row);
 			}
 
 			TransformerFactory transformerFactory = TransformerFactory.newInstance();
@@ -81,14 +80,14 @@ public class DrawLine extends JFrame{
 				Element row = (Element) rowList.item(0);
 				String rowText = row.getTextContent();
 				String[] rowString = rowText.split("");
+				System.out.println(rowText);
 				for (int x = 0;x < 4;x++) {
-					board[y][x] = rowString[y];
-					if(Character.isWhitespace(alphaText.charAt(i))){
+					board[y][x] = rowString[x];
+					if(Character.isWhitespace(rowText.charAt(x))){
 						blank_position[0]=y;
 						blank_position[1]=x;
 						System.out.printf("%d %d", x,y);
 					}
-					i++;
 				}
 			}
 		}
@@ -131,50 +130,10 @@ public class DrawLine extends JFrame{
 		});
 
 		setVisible(true);
-		randomAlpha();
+		//randomAlpha();
 	}
 
 	public static void main(String[] args){
-		try{
-			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-			Document doc = dBuilder.newDocument();
-
-			Element rootElement = doc.createElement("ABCBlockMAP");
-			doc.appendChild(rootElement);
-
-			Element information = doc.createElement("information");
-			rootElement.appendChild(information);
-			Element GameVersion = doc.createElement("GameVersion");
-			GameVersion.appendChild(doc.createTextNode("0"));
-			Element PlayTime = doc.createElement("PlayTime");
-			PlayTime.appendChild(doc.createTextNode("0"));
-			Element MoveCount = doc.createElement("MoveCount");
-			MoveCount.appendChild(doc.createTextNode("0"));
-
-			Element Map = doc.createElement("Map");
-			rootElement.appendChild(Map);
-
-			for (int r = 0;r < 3;r++) {
-				String data = "";
-				String Name = "Row" + String.valueOf(i+1);
-				for (int c = 0;c < 4;c++) {
-					data += board[r][c];
-				}
-				Element Row = doc.createElement(Name);
-				Row.appendChild(doc.createTextNode(data));
-				children.appendChild(Row);
-			}
-
-			TransformerFactory transformerFactory = TransformerFactory.newInstance();
-			Transformer transformer = transformerFactory.newTransformer();
-			DOMSource source = new DOMSource(doc);
-			StreamResult result = new StreamResult(new File("java_abc_game.xml"));
-			transformer.transform(source, result);
-
-		}catch(Exception e){
-			e.printStackTrace();
-		}
 		new DrawLine();
 		//		checkWinner(board);
 		//		if(checkWinner(board) == true){

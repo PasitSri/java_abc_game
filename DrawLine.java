@@ -125,6 +125,10 @@ public class DrawLine extends JFrame{
 				swapChar(e.getX(), e.getY());
 				SaveGame();
 				repaint();
+				checkWinner(board);
+				if(checkWinner(board) == true){
+					winSceen();
+				}
 			}
 
 		});
@@ -176,14 +180,14 @@ public class DrawLine extends JFrame{
 		return true;
 	}
 
-	//	public static void winSceen(){
-	//		JFrame f = new JFrame();
-	//		Label l = new Label("VICTORY");
-	//		f.add(l);
-	//		f.setSize(800,600);
-	//		f.setBackground(Color.black);
-	//		f.setVisible(true);
-	//	}
+	public static void winSceen(){
+		JFrame f = new JFrame();
+		Label l = new Label("VICTORY");
+		f.add(l);
+		f.setSize(800,600);
+		f.setBackground(Color.black);
+		f.setVisible(true);
+	}
 
 	public void swapChar(int mouseX, int mouseY){
 		int block_x=0;

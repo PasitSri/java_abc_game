@@ -20,7 +20,7 @@ import java.io.File;
 class DrawLine extends JFrame{
     int RowSize = 5 , ColSize = 5;
     int w=800, h=637;
-    int size=w/RowSize;
+    int sizeC = w/RowSize , sizeR = (h-37)/ColSize;
     //static String[][] board={ {"A","B","C","D"},{"E","F","G","H"},{"I","J"," ","K"}};
     String[ ][ ] board = new String[RowSize][ColSize];
     int[] blank_position = {2,2};
@@ -133,12 +133,12 @@ class DrawLine extends JFrame{
         g.setColor(Color.white);
         g.fillRect(0,0,w,h);
         g.setColor(Color.black);
-        g.setFont(new Font("Ubuntu", Font.PLAIN, 70));
+        g.setFont(new Font("Ubuntu", Font.PLAIN, sizeR/2));
         for(int r=0; r<RowSize; r++){
             for(int c=0; c<ColSize; c++){
                 int n = fm.stringWidth(board[r][c]);
-                g.drawString(board[r][c], (c*size)+(size/2-n*2), 37+(r*size)+(size/2+15));
-                g.drawRect(w-(c*size),37+(r*size),size,size);
+                g.drawString(board[r][c], (c*sizeC)+(sizeC/2-n*2), 37+(r*sizeR)+(sizeR/2+15));
+                g.drawRect(c*sizeC,37+(r*sizeR),sizeC,sizeR);
             }
         }
     }

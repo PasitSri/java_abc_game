@@ -156,10 +156,10 @@ class DrawLine extends JFrame{
                 swapChar(e.getX(), e.getY());
                 SaveGame();
                 repaint();
-                checkWinner(board);
-                if(checkWinner(board) == true){
-                    winSceen();
-                }
+                // checkWinner(board);
+                // if(checkWinner(board) == true){
+                //     winSceen();
+                // }
             }
 
         });
@@ -214,9 +214,9 @@ class DrawLine extends JFrame{
     public void swapChar(int mouseX, int mouseY){
         int block_x=0;
         int block_y=0;
-        for(int r=0; r<3; r++){
-            for(int c=0; c<4; c++){
-                if(mouseX>block_x && mouseX<block_x+sizeR && mouseY>block_y && mouseY<block_y+sizeC){
+        for(int r=0; r<sizeR; r++){
+            for(int c=0; c<sizeC; c++){
+                if(mouseX>block_x && mouseX<block_x+sizeC && mouseY>block_y && mouseY<block_y+sizeR){
                     if(((r-1==blank_position[0]||r+1==blank_position[0]) && c==blank_position[1]) || ((c-1==blank_position[1]||c+1==blank_position[1]) &&r==blank_position[0])){
                         board[blank_position[0]][blank_position[1]] = board[r][c];
                         board[r][c] = " ";
@@ -224,10 +224,10 @@ class DrawLine extends JFrame{
                         blank_position[1] = c;
                     }
                 }
-                block_x += sizeR;
+                block_x += sizeC;
             }
             block_x =0;
-            block_y += sizeC;
+            block_y += sizeR;
         }
     }
 

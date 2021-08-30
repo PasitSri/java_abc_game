@@ -5,55 +5,90 @@ import java.util.Random;
 import java.awt.event.MouseAdapter;
 import java.awt.FontMetrics;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 import org.w3c.dom.Node;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 
 class DrawLine extends JFrame{
-    int RowSize = 5 , ColSize = 5;
+    int RowAmount = 5 , ColAmount = 5;
     int w=800, h=637;
-    int sizeC = w/RowSize , sizeR = (h-37)/ColSize;
-    //static String[][] board={ {"A","B","C","D"},{"E","F","G","H"},{"I","J"," ","K"}};
-    String[ ][ ] board = new String[RowSize][ColSize];
+    int ColSize = w/RowAmount , RowSize = (h-37)/ColAmount;
+    String[ ][ ] board = new String[RowAmount][ColAmount];
+    String[ ][ ] boardwinner = new String[RowAmount][ColAmount];
     int[] blank_position = {2,2};
 
     public static void main(String[] args){
+
         DrawLine play = new DrawLine();
+        //play.IsSaved();
         play.SetBoard();
-        //		checkWinner(board);
-        //		if(checkWinner(board) == true){
-        //			winSceen();
-        //		}
+        //System.out.println("win");
+        //System.out.println(play.checkWinner());
+        
+        if(play.checkWinner()){
+            System.out.println("win");
+            play.winSceen();
+        }
+        //main(args);
     }
+    /*public void IsSaved(){
+        // เอาไว้ Check ว่าเซฟไว้รึป่าว
+        File inputFile = new File("java_abc_game.xml");
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+        Document doc = dBuilder.parse(inputFile);
+
+        NodeList list = doc.getElementsByTagName("Map");
+        System.out.println(list);
+
+        //System.out.println(doc.getChildNodes());
+    
+    }*/
     public void SetBoard(){
         int i = 65;
-        for (int r = 0;r < RowSize;r++) {
-            for (int c = 0; c < ColSize; c++) {
-                if(i == 65 + ( RowSize*ColSize - 1)){
+        for (int r = 0;r < RowAmount;r++) {
+            for (int c = 0; c < ColAmount; c++) {
+                if(i == 65 + ( RowAmount*ColAmount - 1)){
                     board[r][c] = " ";
+                    boardwinner[r][c] = " ";
                 }
                 else {
                     board[r][c] = String.valueOf((char) i);
+                    boardwinner[r][c] = String.valueOf((char) i);
                 }
                 i++;
             }
         }
-        System.out.print("---------------------\n");
-        for (int r = 0;r < RowSize;r++) {
-            for (int c = 0; c < ColSize; c++) {
+        /*System.out.print("---------------------\n");
+        for (int r = 0;r < RowAmount;r++) {
+            for (int c = 0; c < ColAmount; c++) {
                 System.out.print(board[r][c]);
             }
             System.out.print("\n");
         }
         System.out.print("---------------------");
+        System.out.print("---------------------\n");
+        for (int r = 0;r < RowAmount;r++) {
+            for (int c = 0; c < ColAmount; c++) {
+                System.out.print(boardwinner[r][c]);
+            }
+            System.out.print("\n");
+        }
+        System.out.print("---------------------");*/
     }
     public void SaveGame() {
         try{
@@ -76,10 +111,10 @@ class DrawLine extends JFrame{
             Element Map = doc.createElement("Map");
             rootElement.appendChild(Map);
 
-            for (int r = 0;r < RowSize;r++) {
+            for (int r = 0;r < RowAmount;r++) {
                 String data = "";
                 String Name = "Row" + String.valueOf(r+1);
-                for (int c = 0;c < ColSize;c++) {
+                for (int c = 0;c < ColAmount;c++) {
                     data += board[r][c];
                 }
                 Element Row = doc.createElement(Name);
@@ -105,14 +140,14 @@ class DrawLine extends JFrame{
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(inputFile);
 
-            for (int y = 0;y < RowSize;y++) {
+            for (int y = 0;y < RowAmount;y++) {
                 String Name = "Row" + String.valueOf(y+1);
                 NodeList rowList = doc.getElementsByTagName(Name);
                 Element row = (Element) rowList.item(0);
                 String rowText = row.getTextContent();
                 String[] rowString = rowText.split("");
                 //System.out.println(rowText);
-                for (int x = 0;x < ColSize;x++) {
+                for (int x = 0;x < ColAmount;x++) {
                     board[y][x] = rowString[x];
                     if(Character.isWhitespace(rowText.charAt(x))){
                         blank_position[0]=y;
@@ -133,12 +168,12 @@ class DrawLine extends JFrame{
         g.setColor(Color.white);
         g.fillRect(0,0,w,h);
         g.setColor(Color.black);
-        g.setFont(new Font("Ubuntu", Font.PLAIN, sizeR/2));
-        for(int r=0; r<RowSize; r++){
-            for(int c=0; c<ColSize; c++){
+        g.setFont(new Font("Ubuntu", Font.PLAIN, RowSize/2));
+        for(int r=0; r<RowAmount; r++){
+            for(int c=0; c<ColAmount; c++){
                 int n = fm.stringWidth(board[r][c]);
-                g.drawString(board[r][c], (c*sizeC)+(sizeC/2-n*2), 37+(r*sizeR)+(sizeR/2+15));
-                g.drawRect(c*sizeC,37+(r*sizeR),sizeC,sizeR);
+                g.drawString(board[r][c], (c*ColSize)+(ColSize/2-n*2), 37+(r*RowSize)+(RowSize/2+15));
+                g.drawRect(c*ColSize,37+(r*RowSize),ColSize,RowSize);
             }
         }
     }
@@ -190,11 +225,10 @@ class DrawLine extends JFrame{
     }
 
 
-    public static boolean checkWinner(String[][] board){
-        String[][] boardWinner = { {"A","B","C","D"},{"E","F","G","H"},{"I","J","K"," "}};
+    public boolean checkWinner(){
         for(int r=0; r<3; r++){
             for(int c=0; c<4; c++){
-                if(board[r][c] != boardWinner[r][c]){
+                if(board[r][c] != boardwinner[r][c]){
                     return false;
                 }
             }
@@ -202,7 +236,8 @@ class DrawLine extends JFrame{
         return true;
     }
 
-    public static void winSceen(){
+    public void winSceen(){
+        System.out.println("Win");
         JFrame f = new JFrame();
         Label l = new Label("VICTORY");
         f.add(l);
@@ -214,9 +249,9 @@ class DrawLine extends JFrame{
     public void swapChar(int mouseX, int mouseY){
         int block_x=0;
         int block_y=0;
-        for(int r=0; r<sizeR; r++){
-            for(int c=0; c<sizeC; c++){
-                if(mouseX>block_x && mouseX<block_x+sizeC && mouseY>block_y && mouseY<block_y+sizeR){
+        for(int r=0; r<RowSize; r++){
+            for(int c=0; c<ColSize; c++){
+                if(mouseX>block_x && mouseX<block_x+ColSize && mouseY>block_y && mouseY<block_y+RowSize){
                     if(((r-1==blank_position[0]||r+1==blank_position[0]) && c==blank_position[1]) || ((c-1==blank_position[1]||c+1==blank_position[1]) &&r==blank_position[0])){
                         board[blank_position[0]][blank_position[1]] = board[r][c];
                         board[r][c] = " ";
@@ -224,10 +259,10 @@ class DrawLine extends JFrame{
                         blank_position[1] = c;
                     }
                 }
-                block_x += sizeC;
+                block_x += ColSize;
             }
             block_x =0;
-            block_y += sizeR;
+            block_y += RowSize;
         }
     }
 

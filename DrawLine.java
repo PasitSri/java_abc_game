@@ -25,24 +25,25 @@ import java.io.IOException;
 
 class DrawLine extends JFrame{
     int RowAmount = 5 , ColAmount = 5;
-    int w=800, h=637;
-    int ColSize = w/RowAmount , RowSize = (h-37)/ColAmount;
+    int w=800, h=600;
+    int ColSize = w/ColAmount , RowSize = h/RowAmount;
     String[ ][ ] board = new String[RowAmount][ColAmount];
     String[ ][ ] boardwinner = new String[RowAmount][ColAmount];
     int[] blank_position = {2,2};
+	boolean winner = false;
 
     public static void main(String[] args){
 
         DrawLine play = new DrawLine();
         //play.IsSaved();
-        play.SetBoard();
+        //play.SetBoard();
         //System.out.println("win");
         //System.out.println(play.checkWinner());
         
-        if(play.checkWinner()){
-            System.out.println("win");
-            play.winSceen();
-        }
+        //if(play.checkWinner()){
+            //System.out.println("win");
+            //play.winSceen();
+        //}
         //main(args);
     }
     /*public void IsSaved(){
@@ -65,6 +66,8 @@ class DrawLine extends JFrame{
                 if(i == 65 + ( RowAmount*ColAmount - 1)){
                     board[r][c] = " ";
                     boardwinner[r][c] = " ";
+					blank_position[0] =r;
+					blank_position[1] =c;
                 }
                 else {
                     board[r][c] = String.valueOf((char) i);
@@ -73,6 +76,7 @@ class DrawLine extends JFrame{
                 i++;
             }
         }
+		printBoard();
         /*System.out.print("---------------------\n");
         for (int r = 0;r < RowAmount;r++) {
             for (int c = 0; c < ColAmount; c++) {
@@ -90,6 +94,14 @@ class DrawLine extends JFrame{
         }
         System.out.print("---------------------");*/
     }
+	public void printBoard(){
+		for(int r=0; r<5; r++){
+			for(int c=0; c<5; c++){
+				System.out.printf("%s", board[r][c]);
+			}
+		}
+		System.out.println(' ');
+	}
     public void SaveGame() {
         try{
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -164,18 +176,28 @@ class DrawLine extends JFrame{
 
 
     public void paint(Graphics g){
-        FontMetrics fm = g.getFontMetrics();
-        g.setColor(Color.white);
-        g.fillRect(0,0,w,h);
-        g.setColor(Color.black);
-        g.setFont(new Font("Ubuntu", Font.PLAIN, RowSize/2));
-        for(int r=0; r<RowAmount; r++){
-            for(int c=0; c<ColAmount; c++){
-                int n = fm.stringWidth(board[r][c]);
-                g.drawString(board[r][c], (c*ColSize)+(ColSize/2-n*2), 37+(r*RowSize)+(RowSize/2+15));
-                g.drawRect(c*ColSize,37+(r*RowSize),ColSize,RowSize);
-            }
-        }
+		if(winner){
+			g.setColor(Color.white);
+			g.fillRect(0,0,w,h);
+			g.setColor(Color.black);
+			g.setFont(new Font("Ubuntu", Font.PLAIN, RowSize/2));
+			g.drawString("Winner", 300, 300);
+		}
+		else{
+			FontMetrics fm = g.getFontMetrics();
+			g.setColor(Color.white);
+			g.fillRect(0,0,w,h);
+			g.setColor(Color.black);
+			g.setFont(new Font("Ubuntu", Font.PLAIN, RowSize/2));
+			for(int r=0; r<RowAmount; r++){
+				for(int c=0; c<ColAmount; c++){
+					int n = fm.stringWidth(board[r][c]);
+					g.drawString(board[r][c], (c*ColSize)+(ColSize/2-n*2), 37+(r*RowSize)+(RowSize/2+15));
+					g.drawRect(c*ColSize,(r*RowSize),ColSize,RowSize);
+				}
+			}
+
+		}
     }
 
     public DrawLine(){
@@ -184,17 +206,22 @@ class DrawLine extends JFrame{
         setBackground(Color.white);
         setTitle("Sorting Game");
         setSize(w, h);
-        LoadGame();
+		SetBoard();
+		LoadGame();
         repaint();
         addMouseListener(new MouseAdapter(){
             public void mouseClicked(MouseEvent e){
-                swapChar(e.getX(), e.getY());
-                SaveGame();
-                repaint();
-                // checkWinner(board);
-                // if(checkWinner(board) == true){
-                //     winSceen();
-                // }
+				 if(winner){
+					System.out.println("winner");
+					repaint();
+				 }else{
+					swapChar(e.getX(), e.getY());
+					SaveGame();
+					checkWinner();
+					System.out.println(winner);
+					repaint();
+				 }
+
             }
 
         });
@@ -228,11 +255,14 @@ class DrawLine extends JFrame{
     public boolean checkWinner(){
         for(int r=0; r<3; r++){
             for(int c=0; c<4; c++){
-                if(board[r][c] != boardwinner[r][c]){
+                if(!board[r][c].equals(boardwinner[r][c])){
+					System.out.printf("%s %s\n", board[r][c], boardwinner[r][c]);
+					winner = false;
                     return false;
                 }
             }
         }
+		winner = true;
         return true;
     }
 
@@ -247,23 +277,31 @@ class DrawLine extends JFrame{
     }
 
     public void swapChar(int mouseX, int mouseY){
-        int block_x=0;
-        int block_y=0;
-        for(int r=0; r<RowSize; r++){
-            for(int c=0; c<ColSize; c++){
-                if(mouseX>block_x && mouseX<block_x+ColSize && mouseY>block_y && mouseY<block_y+RowSize){
-                    if(((r-1==blank_position[0]||r+1==blank_position[0]) && c==blank_position[1]) || ((c-1==blank_position[1]||c+1==blank_position[1]) &&r==blank_position[0])){
-                        board[blank_position[0]][blank_position[1]] = board[r][c];
-                        board[r][c] = " ";
-                        blank_position[0] = r;
-                        blank_position[1] = c;
-                    }
-                }
-                block_x += ColSize;
-            }
-            block_x =0;
-            block_y += RowSize;
-        }
+		int block_x=0;
+		int block_y=0;
+		int row = mouseY/RowSize;
+		int col = mouseX/ColSize;
+		if(((row-1==blank_position[0]||row+1==blank_position[0]) && col==blank_position[1]) || ((col-1==blank_position[1]||col+1==blank_position[1]) &&row==blank_position[0])){
+			board[blank_position[0]][blank_position[1]] = board[row][col];
+			board[row][col] = " ";
+			blank_position[0] = row;
+			blank_position[1] = col;
+		}
+		//for(int r=0; r<RowSize; r++){
+		//for(int c=0; c<ColSize; c++){
+		//if(mouseX>block_x && mouseX<block_x+ColSize && mouseY>block_y && mouseY<block_y+RowSize){
+		//if(((r-1==blank_position[0]||r+1==blank_position[0]) && c==blank_position[1]) || ((c-1==blank_position[1]||c+1==blank_position[1]) &&r==blank_position[0])){
+		//board[blank_position[0]][blank_position[1]] = board[r][c];
+		//board[r][c] = " ";
+		//blank_position[0] = r;
+		//blank_position[1] = c;
+		//}
+		//}
+		//block_x += ColSize;
+		//}
+		//block_x =0;
+		//block_y += RowSize;
+		//}
     }
 
 }
